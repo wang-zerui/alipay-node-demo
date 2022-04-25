@@ -65,7 +65,7 @@ $(function () {
 
         // 像服务器发送付款请求确认
         $.ajax({
-            url: './payinfo',
+            url: 'https://1893791694056142.cn-hangzhou.fc.aliyuncs.com/2016-08-15/proxy/web-framework/express-app/payinfo',
             data: {
                 payName: $('#username').val().trim(),
                 goodsName: goodsName,
@@ -88,7 +88,7 @@ $(function () {
                         // 利用 ajax 发送订单生成订单请求
                         $.ajax({
                             type: 'post',
-                            url: './createOrder',
+                            url: 'https://1893791694056142.cn-hangzhou.fc.aliyuncs.com/2016-08-15/proxy/web-framework/express-app/createOrder',
                             data: {
                                 payName: $('#username').val().trim(),
                                 goodsName: goodsName,
@@ -112,7 +112,7 @@ $(function () {
         console.log(111)
         // 发送请求
         $.ajax({
-            url: './getorder',
+            url: 'https://1893791694056142.cn-hangzhou.fc.aliyuncs.com/2016-08-15/proxy/web-framework/express-app/getorder',
             success: function (res) {
                 if (res.code === 200) {
                     var list = JSON.parse(res.list);
