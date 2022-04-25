@@ -1,0 +1,32 @@
+edition: 1.0.0
+name: web-framework-app
+access: ali
+
+vars: # 全局变量
+  region: cn-hangzhou
+  service:
+    name: web-framework
+    description: 'Serverless Devs Web Framework Service'
+
+services:
+  framework: # 业务名称/模块名称
+    component: fc # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
+    props: # 组件的属性值
+      region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
+      service: ${vars.service}
+      function:
+        name: express-app
+        description: 'Serverless Devs Web Framework Function'
+        runtime: nodejs12
+        codeUri: ./code
+        handler: index.handler
+        memorySize: 256
+        timeout: 6
+      triggers:
+        - name: http-trigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+              - POST

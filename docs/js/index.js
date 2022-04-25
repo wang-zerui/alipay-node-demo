@@ -109,6 +109,7 @@ $(function () {
 
     // 点击查询订单
     $('#searchOrder').click(function () {
+        console.log(111)
         // 发送请求
         $.ajax({
             url: './getorder',

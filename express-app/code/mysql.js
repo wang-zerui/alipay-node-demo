@@ -7,10 +7,10 @@ const mysql = require('mysql');
 
 // 配置 mysql
 const mysqlConfig = {
-    host: 'localhost', // 数据库主机名
-    port: '3306', // 端口号
-    user: 'root', // 用户名
-    password: '123456', // 密码
+    host: 'rm-bp1ktvu431e349e777o.mysql.rds.aliyuncs.com', // 数据库主机名
+    port: '2333', // 端口号
+    user: 'xinwuyun', // 用户名
+    password: 'wangzerui@142536', // 密码
     database: 'alipay', // 数据库名
 }
 
@@ -28,7 +28,16 @@ function selectSql(sqlstr,callback) {
 
 // 封装添加函数
 function addSql(sqlstr,callback) {
-    return selectSql(sqlstr,callback);
+    var con = mysql.createConnection(mysqlConfig);
+      
+    con.connect(function(err) {
+        if (err) throw err;
+        console.log("Connected!");
+        con.query(sqlstr, function (err, result) {
+            if (err) throw err;
+            console.log("1 record inserted");
+        });
+    });
 }
 
 // 将两个数据库操作方法暴露

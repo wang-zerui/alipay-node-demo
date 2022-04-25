@@ -1,14 +1,10 @@
 const path = require("path");
 const bp = require('body-parser');
-// 引入自定义 mysql 工具
 const mysql = require(path.join(__dirname, './mysql.js'));
-// 引入 express
 const express = require('express');
-// 获取 express 实例对象
 let app = express();
 
-// 设置托管静态资源
-app.use(express.static(path.join(__dirname, './public')));
+app.use(express.json());
 // 处理 post 请求参数
 app.use(bp.urlencoded({
     extended: false
@@ -29,8 +25,10 @@ app.get('/payinfo', (req, res) => {
 })
 
 // 获取创建订单的自定义模块
+// import createOrder  from "./createOrder";
 const createOrder = require(path.join(__dirname, './createOrder.js')).createOrder;
 // 获取验签自定义模块
+// import checkSign from './checkSign'
 const checkSign = require(path.join(__dirname, './checkSign.js'));
 
 // 生成订单请求
@@ -61,7 +59,7 @@ app.get('/payresult', (req, res) => {
     res.send(htmlStr);
 })
 
-app.post('/notify.html', (req, res) => {
+app.post('/notify', (req, res) => {
     // 输出验签结果
     async function checkResult(postData) {
         let result = await checkSign(postData);
@@ -82,7 +80,16 @@ app.post('/notify.html', (req, res) => {
             `;
             // 响应支付宝 success 处理成功，否则支付宝会一直定时发送异步通知
             res.end('success');
-            mysql.addSql(sqlStr)
+            console.log(sqlStr)
+            mysql.addSql(sqlStr, function (err, result) {
+                if(err){
+                      console.log('[UPDATE ERROR] - ',err.message);
+                      return;
+                }        
+               console.log('--------------------------UPDATE----------------------------');
+               console.log('UPDATE affectedRows',result.affectedRows);
+               console.log('-----------------------------------------------------------------\n\n');
+             })
         }
     }
     checkResult(req.body);
@@ -99,7 +106,4 @@ app.get('/getorder', (req, res) => {
         res.send(result);
     });
 })
-
-app.listen(9999, () => {
-    console.log('server start with 9999...');
-})
+module.exports = app;
