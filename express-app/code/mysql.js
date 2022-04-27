@@ -26,6 +26,23 @@ function selectSql(sqlstr,callback) {
     }
 }
 
+function selectSql2(sqlStr, callback){
+    let mysqlConfig2 = {
+        host: 'rm-bp1ktvu431e349e777o.mysql.rds.aliyuncs.com', // 数据库主机名
+        port: '2333', // 端口号
+        user: 'xinwuyun', // 用户名
+        password: 'wangzerui@142536', // 密码
+        database: 'bookery', // 数据库名
+    }
+    let con = mysql.createConnection(mysqlConfig2);
+    console.log(11112222)
+    con.connect(function(err) {
+        if (err) throw err;
+        console.log("Connected!");
+        con.query(sqlStr, callback);
+    });
+}
+
 // 封装添加函数
 function addSql(sqlstr,callback) {
     var con = mysql.createConnection(mysqlConfig);
@@ -33,15 +50,13 @@ function addSql(sqlstr,callback) {
     con.connect(function(err) {
         if (err) throw err;
         console.log("Connected!");
-        con.query(sqlstr, function (err, result) {
-            if (err) throw err;
-            console.log("1 record inserted");
-        });
+        con.query(sqlstr, callback);
     });
 }
 
 // 将两个数据库操作方法暴露
 module.exports = {
     selectSql: selectSql,
+    selectSql2: selectSql2,
     addSql: addSql
 }

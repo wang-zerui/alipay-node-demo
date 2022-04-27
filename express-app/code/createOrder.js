@@ -37,7 +37,7 @@ async function createOrder(goods) {
         passback_params: JSON.stringify(goods.pack_params), // 将会返回的一个参数，可用于自定义商品信息最后做通知使用
     }
     const formData = new AlipayFormData(); // 获取一个实例化对象
-    formData.addField('returnUrl', 'https://1893791694056142.cn-hangzhou.fc.aliyuncs.com/2016-08-15/proxy/web-framework/express-app/payresult'); // 客户端支付成功后会同步跳回的地址
+    formData.addField('returnUrl', 'http://localhost:8080/#/payresult'); // 客户端支付成功后会同步跳回的地址
     formData.addField('notifyUrl', 'https://1893791694056142.cn-hangzhou.fc.aliyuncs.com/2016-08-15/proxy/web-framework/express-app/notify'); // 支付宝在用户支付成功后会异步通知的回调地址，必须在公网 IP 上才能收到
     formData.addField('bizContent', bizContent); // 将必要的参数集合添加进 form 表单
 

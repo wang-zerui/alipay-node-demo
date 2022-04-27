@@ -36,6 +36,8 @@ app.post('/createOrder', (req, res) => {
     console.log(req.body.price);
     req.body.pack_params = {
         payName: req.body.payName,
+        ISBN: req.body.ISBN,
+        book_id: req.body.book_id,
         goodsName: req.body.goodsName,
         price: req.body.price,
         count: req.body.count,
@@ -59,15 +61,30 @@ app.get('/payresult', (req, res) => {
     res.send(htmlStr);
 })
 
-app.post('/notify', (req, res) => {
+app.post('/notify', async (req, res) => {
     // 输出验签结果
     async function checkResult(postData) {
         let result = await checkSign(postData);
         if (result) {
-            // console.log('订单成功支付！！！请做处理')
-            // console.log(req.body);
+            
             let data = req.body;
             let goods = JSON.parse(data.passback_params);
+
+            let sqlStr2 = `
+            update fine set status=1
+            where borrow_id=${goods.goodsName.slice(4)}
+            `
+            console.log(sqlStr2);
+            await mysql.selectSql2(sqlStr2, function (err, result) {
+                if(err){
+                      console.log('[UPDATE ERROR] - ',err.message);
+                      return;
+                }        
+               console.log('--------------------------UPDATE----------------------------');
+               console.log('UPDATE affectedRows',result.affectedRows);
+               console.log('-----------------------------------------------------------------\n\n');
+             });
+
             let sqlStr = `
             insert into order_list value("${data.out_trade_no}",
                 "${data.trade_no}",
@@ -79,9 +96,9 @@ app.post('/notify', (req, res) => {
                 "${goods.payName}");
             `;
             // 响应支付宝 success 处理成功，否则支付宝会一直定时发送异步通知
-            res.end('success');
+            
             console.log(sqlStr)
-            mysql.addSql(sqlStr, function (err, result) {
+            await mysql.addSql(sqlStr, function (err, result) {
                 if(err){
                       console.log('[UPDATE ERROR] - ',err.message);
                       return;
@@ -90,14 +107,58 @@ app.post('/notify', (req, res) => {
                console.log('UPDATE affectedRows',result.affectedRows);
                console.log('-----------------------------------------------------------------\n\n');
              })
+
         }
     }
-    checkResult(req.body);
+    await checkResult(req.body);
+})
+
+app.post('/test', (req, res) => {
+        let sqlStr = `insert into order_list value("1650943432775",
+        "2022042622001490230505652905",
+        "fine947753152",
+        20,
+        1,
+        20.00,
+        "支付成功",
+        "4");
+`
+        mysql.addSql(sqlStr, function (err, result) {
+            if(err){
+                console.log('[UPDATE ERROR] - ',err.message);
+                return;
+            }        
+        console.log('--------------------------UPDATE----------------------------');
+        console.log('UPDATE affectedRows',result.affectedRows);
+        console.log('-----------------------------------------------------------------\n\n');
+        })
+        let sqlStr2 = `
+        update fine set status=1
+            where borrow_id=947753152
+        `
+        console.log(sqlStr2);
+        mysql.selectSql2(sqlStr2, function (err, result) {
+            if(err){
+                    console.log('[UPDATE ERROR] - ',err.message);
+                    return;
+            }        
+            console.log('--------------------------UPDATE----------------------------');
+            console.log('UPDATE affectedRows',result.affectedRows);
+            console.log('-----------------------------------------------------------------\n\n');
+            });
+        
 })
 
 // 查询订单接口
 app.get('/getorder', (req, res) => {
-    mysql.selectSql('select * from order_list', (err, result) => {
+    let user_id = req.query.user_id;
+    let sql = `
+    select fine_id, book.ISBN, borrow.book_id, fine.amount, fine.status, fine.payment_time, book.book_name, borrow.borrowing_number
+    from fine, borrow, book 
+    where fine.user_id=${user_id} and fine.borrow_id=borrow.borrowing_number and book.ISBN=borrow.ISBN
+    `
+    mysql.selectSql2(sql, (err, result) => {
+        
         result = Object.assign({
             code: 200,
             msg: '获取成功',
@@ -106,4 +167,5 @@ app.get('/getorder', (req, res) => {
         res.send(result);
     });
 })
+// app.listen(3000)
 module.exports = app;
